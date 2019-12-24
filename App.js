@@ -1,119 +1,133 @@
-import React, {Component} from 'react';
-import { Text, View,StyleSheet,Image  } from 'react-native';
-import { NavigationNativeContainer, createAppContainer } from 'react-navigation';
-import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { Container, Header, Left, Body, Right, Button, Title } from 'native-base';
-//import Icon from "react-native-vector-icons/FontAwesome";
-import { Appbar, Icon } from 'react-native-paper';
-import { createStackNavigator } from 'react-navigation-stack';
+import React, {Component,useState} from 'react';
+import { Image,ImageBackground,View,Text, StyleSheet } from 'react-native';
+import {  createAppContainer, } from 'react-navigation';
+import{createBottomTabNavigator} from 'react-navigation-tabs'
+import {createStackNavigator} from 'react-navigation-stack';
+import HomeActivity from './components/screens/homeScreen';
+import SearchActivity from './components/screens/searchScreen';
+import DetailsActivity from './components/screens/detailsScreen';
+import MoreActivity from './components/screens/moreScreen';
+import style from "./components/styles/style"
 
-// class CustomHeader extends React.Component{
-//   render() {
-//     let {title , isHome} = this.props
-//     return(
-     
-//        <Appbar.Header style={{justifyContent:"center", backgroundColor:"white"}}>
-//         {/* <Appbar.BackAction
-//           onPress={this._goBack}
-//         /> */}
-//         <Appbar.Content style={{alignItems:"center", }}
-//           title="Home" 
-          
-//         />
-//         <Appbar.Action icon="filter" size={30} color="#900"  style={{position:"absolute", right:0}}   onPress={this._handleMore} />
-//       </Appbar.Header>
-      
-//     );
-//   }
-// }
-const styles = StyleSheet.create({
-  top: {
-   backgroundColor:'white',
-    alignItems: "center"
+const SplashScreen= () => {
+  return (
+    <View style={ [style.container] }>
+      <ImageBackground  style= { style.backgroundImage } source={require('./components/assets/play.png')} >
+      </ImageBackground>
+    </View>
+  );
+
+};
+const HomeTab = createStackNavigator(
+  {
+    Home: HomeActivity ,
+    Details: DetailsActivity ,
   },
-});
-
-class HomeScreen extends React.Component{
-  render(){
-    return (
-      <View style={{ flex: 1 }}>
-        <Appbar.Header style={{justifyContent:"center", backgroundColor:"white"}}>
-        {/* <Appbar.BackAction
-          onPress={this._goBack}
-        /> */}
-        <Appbar.Content style={{alignItems:"center", }}
-          title="Home" 
-          
-        />
-        <Appbar.Action icon="filter" size={30} color="#900"  style={{position:"absolute", right:0}}   onPress={this._handleMore} />
-      </Appbar.Header>
-        <View style={{flex:1,justifyContent: 'center', alignItems: 'center'}}>
-        
-      <Text>Home!</Text>
-        </View>
-        
-    </View>
-    )
+  {
+    defaultNavigationOptions: {
+      header:null,
+    //   headerStyle: {
+    //     backgroundColor: 'white',
+    //   },
+    //   headerTitleStyle: { 
+    //     textAlign:"center", 
+    //     flex:1 ,
+    //    // marginLeft:10,
+    // },
+    
+      headerTintColor: 'black',
+      title: 'Home',
+    },
   }
-}
-class SearchScreen extends React.Component{
-  render(){
-    return (
-      <View style={{ flex: 1 }}>
-        <Appbar.Header style={{justifyContent:"center", backgroundColor:"white"}}>
-        {/* <Appbar.BackAction
-          onPress={this._goBack}
-        /> */}
-        <Appbar.Content style={{alignItems:"center", }}
-          title="search" 
-          
-        />
-        <Appbar.Action icon="rocket" size={30} color="#900"  style={{position:"absolute", right:0}}   onPress={this._handleMore} />
-      </Appbar.Header>
-        <View style={{flex:1,justifyContent: 'center', alignItems: 'center'}}>
-        <Button title='Click Me' light>
-          <Text>Go to search</Text>
-        </Button>
-      <Text>Search!</Text>
-        </View>
-        
-    </View>
-    )
+);
+const MoreTab = createStackNavigator(
+  {
+    More: MoreActivity
+  },
+  {
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: 'white',
+      
+      },
+      headerTitleStyle: { 
+        textAlign:"center", 
+        flex:1 
+    },
+      headerTintColor: 'black',
+      title: 'More Tab',
+    },
   }
-}
-class MoreScreen extends React.Component{
-  render(){
-    return (
-      <View style={{ flex: 1 }}>
-        <Appbar.Header style={{justifyContent:"center", backgroundColor:"white"}}>
-        {/* <Appbar.BackAction
-          onPress={this._goBack}
-        /> */}
-        <Appbar.Content style={{alignItems:"center", }}
-          title="More" 
-          
-        />
-        <Appbar.Action icon="rocket" size={30} color="#900"  style={{position:"absolute", right:0}}   onPress={this._handleMore} />
-      </Appbar.Header>
-        <View style={{flex:1,justifyContent: 'center', alignItems: 'center'}}>
-        <Button title='Click Me' onPress={ ()=>this.props.navigation.navigate('Search')}>
-          <Text>Go to search</Text>
-        </Button>
-      <Text>More!</Text>
-        </View>
-        
-    </View>
-    )
+);
+
+const SearchTab = createStackNavigator(
+  {
+    Search: SearchActivity 
+  },
+  {
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: 'white',
+      },
+      headerTitleStyle: { 
+        textAlign:"center", 
+        flex:1 
+    },
+      headerTintColor: 'black',
+      title: 'Search Tab',
+    },
   }
-}
+);
 
+const MainApp = createBottomTabNavigator(
+  {
+    Home: HomeTab ,
+    Search: SearchTab ,
+    More: MoreTab
+  },
+  {
+    defaultNavigationOptions: ({ navigation }) => ({
+      tabBarIcon: ({ focused, horizontal, tintColor }) => {
+        const { routeName } = navigation.state;
+        if (routeName === 'Home') {
+          return (
+            <Image
+              source={ require('./components/assets/home-icon-silhouette.png') }
+              style={{ width: 20, height: 20, }} />
+          );
+        } else if(routeName === 'Search') {
+          return (
+            <Image
+              source={ require('./components/assets/magnifying-glass.png') }
+              style={{ width: 20, height: 20 }} />
+          );
+        }else {
+          return (
+            <Image
+              source={ require('./components/assets/menu.png') }
+              style={{ width: 20, height: 20 }} />
+          );
+        }
 
-const tabNavigator = createBottomTabNavigator({
-  Home:HomeScreen, 
-  Search: SearchScreen,
-  More: MoreScreen
-});
+      },
+    }),
+    tabBarOptions: {
+      activeTintColor: '#FF6F00',
+      inactiveTintColor: '#263238',
+    },
+  }
+);
+const App = () => {
+  const [loading, setLoading ] = useState(true);
+  setTimeout(() =>{
+    setLoading(false);
+  } , 1000);
 
-
-
-export default createAppContainer(tabNavigator);
+  if (loading){
+      return <SplashScreen />
+    } else {
+      return <MainContainer />
+  }
+};
+const MainContainer = createAppContainer(MainApp);
+export default App;
