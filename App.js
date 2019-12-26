@@ -25,15 +25,15 @@ const HomeTab = createStackNavigator(
   },
   {
     defaultNavigationOptions: {
-      header:null,
-    //   headerStyle: {
-    //     backgroundColor: 'white',
-    //   },
-    //   headerTitleStyle: { 
-    //     textAlign:"center", 
-    //     flex:1 ,
-    //    // marginLeft:10,
-    // },
+      
+      headerStyle: {
+        backgroundColor: 'white',
+      },
+      headerTitleStyle: { 
+        textAlign:"center", 
+        flex:1 ,
+       // marginLeft:10,
+    },
     
       headerTintColor: 'black',
       title: 'Home',
