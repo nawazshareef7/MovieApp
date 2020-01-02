@@ -1,133 +1,27 @@
-import React, {Component,useState} from 'react';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 import { Image,ImageBackground,View,Text, StyleSheet } from 'react-native';
-import {  createAppContainer, } from 'react-navigation';
-import{createBottomTabNavigator} from 'react-navigation-tabs'
-import {createStackNavigator} from 'react-navigation-stack';
-import HomeActivity from './components/screens/homeScreen';
-import SearchActivity from './components/screens/searchScreen';
-import DetailsActivity from './components/screens/detailsScreen';
-import MoreActivity from './components/screens/moreScreen';
-import style from "./components/styles/style"
+import HomeIndex from './components/homeIndex'
+import ConfigStore from './components/store/ConfigureStore'
+const store = ConfigStore();
 
-const SplashScreen= () => {
-  return (
-    <View style={ [style.container] }>
-      <ImageBackground  style= { style.backgroundImage } source={require('./components/assets/play.png')} >
-      </ImageBackground>
-    </View>
-  );
-
-};
-const HomeTab = createStackNavigator(
-  {
-    Home: HomeActivity ,
-    Details: DetailsActivity ,
-  },
-  {
-    defaultNavigationOptions: {
-      
-      headerStyle: {
-        backgroundColor: 'white',
-      },
-      headerTitleStyle: { 
-        textAlign:"center", 
-        flex:1 ,
-       // marginLeft:10,
-    },
-    
-      headerTintColor: 'black',
-      title: 'Home',
-    },
+class App extends React.Component{
+  render(){
+    return(
+      <Provider  store={store}>
+        <HomeIndex></HomeIndex>
+      </Provider>
+     
+    )
   }
-);
-const MoreTab = createStackNavigator(
-  {
-    More: MoreActivity
-  },
-  {
-    defaultNavigationOptions: {
-      headerStyle: {
-        backgroundColor: 'white',
-      
-      },
-      headerTitleStyle: { 
-        textAlign:"center", 
-        flex:1 
-    },
-      headerTintColor: 'black',
-      title: 'More Tab',
-    },
-  }
-);
+}
 
-const SearchTab = createStackNavigator(
-  {
-    Search: SearchActivity 
-  },
-  {
-    defaultNavigationOptions: {
-      headerStyle: {
-        backgroundColor: 'white',
-      },
-      headerTitleStyle: { 
-        textAlign:"center", 
-        flex:1 
-    },
-      headerTintColor: 'black',
-      title: 'Search Tab',
-    },
+const styles=StyleSheet.create({
+  container:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center'
   }
-);
-
-const MainApp = createBottomTabNavigator(
-  {
-    Home: HomeTab ,
-    Search: SearchTab ,
-    More: MoreTab
-  },
-  {
-    defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor }) => {
-        const { routeName } = navigation.state;
-        if (routeName === 'Home') {
-          return (
-            <Image
-              source={ require('./components/assets/home-icon-silhouette.png') }
-              style={{ width: 20, height: 20, }} />
-          );
-        } else if(routeName === 'Search') {
-          return (
-            <Image
-              source={ require('./components/assets/magnifying-glass.png') }
-              style={{ width: 20, height: 20 }} />
-          );
-        }else {
-          return (
-            <Image
-              source={ require('./components/assets/menu.png') }
-              style={{ width: 20, height: 20 }} />
-          );
-        }
-
-      },
-    }),
-    tabBarOptions: {
-      activeTintColor: '#FF6F00',
-      inactiveTintColor: '#263238',
-    },
-  }
-);
-const App = () => {
-  const [loading, setLoading ] = useState(true);
-  setTimeout(() =>{
-    setLoading(false);
-  } , 1000);
-
-  if (loading){
-      return <SplashScreen />
-    } else {
-      return <MainContainer />
-  }
-};
-const MainContainer = createAppContainer(MainApp);
+})
 export default App;

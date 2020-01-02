@@ -9,6 +9,9 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import {NavigationNativeContainer, createAppContainer} from 'react-navigation';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 //import { Container, Header, Left, Body, Right, Button, Title } from 'native-base';
@@ -16,15 +19,25 @@ import {createBottomTabNavigator} from 'react-navigation-tabs';
 import {Appbar, Avatar, Icon} from 'react-native-paper';
 import {createStackNavigator, HeaderBackButton} from 'react-navigation-stack';
 import ViewMoreText from 'react-native-read-more-text';
+import * as movieActions from '../action/MoviesDetails';
 
-export default class App extends Component {
+class DetailsScreen extends Component {
   constructor() {
     super();
     this.state = {
-      data: ['image', 'image', 'image', 'image','image','image','image'],
-      data1: [2, 4, 3, 8],
-    };
+     
+      imdbId: '',
+    }
   }
+
+  componentDidMount()
+  {
+    // this.props.getMoviesList();
+    console.log("component did mount");
+    let { actions } = this.props;
+    actions.getMovieDetails(this.state.imdbId);
+  }
+
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Movie Details',
@@ -65,6 +78,14 @@ export default class App extends Component {
     );
   }
   render() {
+    const { movieDetails } = this.props;
+    console.log("MOVIE Details = " +JSON.stringify(movieDetails) );
+    const { navigation } = this.props;
+    this.state.imdbId= navigation.getParam('movieId', 'NO-ID')
+    console.warn('movieId'+this.state.imdbId)
+   var castArray = movieDetails["Actors"].split(',');
+     var writerArray = movieDetails["Writer"].split(',');
+    
     return (
       <View>
         <ScrollView>
@@ -75,7 +96,7 @@ export default class App extends Component {
                 height: 200,
                 //resizeMode: 'contain',
               }}
-              source={require('../assets/apple.jpg')}
+              source={{uri: movieDetails["Poster"]}}
             />
             <Text
               style={{
@@ -104,8 +125,6 @@ export default class App extends Component {
               style={styles.playButtonStyle}
               source={require('../assets/play.png')}
             />
-
-            <View></View>
             <View style={styles.firststRowStyle}>
               <Text style={styles.rowTextStyle}>Duration</Text>
               <Text
@@ -120,13 +139,13 @@ export default class App extends Component {
             </View>
 
             <View style={styles.secondrowStyle}>
-              <Text style={styles.secondrowTextStyle}>02h 30m</Text>
-              <Text style={styles.dramaMusicTextStyle}>Drama, Music</Text>
-              <Text style={styles.secondrowTextStyle}>English</Text>
+              <Text style={styles.secondrowTextStyle}>{movieDetails['Runtime']}</Text>
+              <Text style={styles.dramaMusicTextStyle}>{movieDetails['Genre']}</Text>
+              <Text style={{marginLeft:33,width:80}}>{movieDetails['Language']}</Text>
             </View>
           </View>
           <View style={styles.detailTextStyle}>
-            <Text style={styles.rowTextStyle}>Main Cast</Text>
+            <Text style={styles.rowTextStyle}>Synopsis</Text>
             <View>
               <ViewMoreText
                 numberOfLines={3}
@@ -134,18 +153,15 @@ export default class App extends Component {
                 renderViewLess={this.renderViewLess}
                 textStyle={{textAlign: 'justify'}}>
                 <Text>
-                  Lorem ipsum dolor sit amet, in quo dolorum ponderum, nam veri
-                  molestie constituto eu. Eum enim tantas sadipscing ne, ut
-                  omnes malorum nostrum cum. Errem populo qui ne, ea ipsum
-                  antiopam definitionem eos.
+                 {movieDetails['Plot']}
                 </Text>
               </ViewMoreText>
-              <Text style={styles.headingTextStyle}>Synopsis</Text>
-            </View>
-            <View>
-              <FlatList
+              <Text style={styles.headingTextStyle}>Main Cast</Text>
+              <View >
+               
+              <FlatList style={{marginRight:10}}
                 horizontal={true}
-                data={this.state.data}
+                data={castArray}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({item}) => (
                   <View>
@@ -165,11 +181,16 @@ export default class App extends Component {
                   </View>
                 )}
               />
+              </View>
+              
+            </View>
+            <View>
+            
               <Text style={styles.headingTextStyle}>Main Technical Cast</Text>
             </View>
           </View>
           <View style={{margin: 0}}>
-            <Image source={require('../assets/apple.jpg')} />
+           
           </View>
           
         </ScrollView>
@@ -177,6 +198,21 @@ export default class App extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  
+  movieDetails: state.movieDetails.movieDetails,
+});
+
+const ActionCreators = Object.assign(
+  {},
+  movieActions,
+);
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ActionCreators, dispatch),
+});
+
+export default connect(mapStateToProps,mapDispatchToProps)(DetailsScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -198,10 +234,11 @@ const styles = StyleSheet.create({
   starTwo: {position: 'absolute', left: 45, top: 150, width: 30, height: 30},
   starThree: {position: 'absolute', left: 75, top: 150, width: 30, height: 30},
   dramaMusicTextStyle: {
-    marginRight: 66,
+    //marginRight: 66,
     fontSize: 20,
-    marginLeft: 42,
+    marginLeft: 70,
     fontSize: 15,
+    width:100
     // fontWeight: 'bold'
   },
   playButtonStyle: {
@@ -229,11 +266,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginRight: 48,
-    paddingTop:10
+    paddingTop:10,
+    marginTop:20,
   },
   secondrowTextStyle: {
     fontSize: 15,
-    marginRight: 48,
+    marginLeft: 1,
     justifyContent: 'space-between',
     // margin:5
     // fontWeight: 'bold'
@@ -241,7 +279,7 @@ const styles = StyleSheet.create({
   secondrowStyle: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    //justifyContent: 'space-between',
     position: 'absolute',
 
     margin: 10,
@@ -251,11 +289,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 230,
     left: 10,
+    right:50
   },
   detailTextStyle: {
     margin: 20,
+    marginTop:35,
     paddingTop: 5,
   },
   horizontalFlatListStyle:
-  {paddingTop:5, fontSize: 15,flex:1,flexDirection:'row',marginLeft:20}
+  {paddingTop:5, fontSize: 15,flex:1,flexDirection:'row',marginLeft:8}
 });
